@@ -211,7 +211,7 @@ printDashes(0) :- !.
 printDashes(N) :-
     write('------'),  
     N1 is N - 2,
-    print_dashes(N1).
+    printDashes(N1).
 
 
 printRowsWithNumbers([], _).
@@ -224,11 +224,11 @@ printRowsWithNumbers([Row|Rest], RowNum) :-
     printRowsWithNumbers(Rest, NextRowNum).
 
 
-print_row([]).
-print_row([[Cell, State]|Rest]) :-
-    print_cell(Cell, State),
+printRow([]).
+printRow([[Cell, State]|Rest]) :-
+    printCell(Cell, State),
     write('  '),  
-    print_row(Rest).
+    printRow(Rest).
 
 
 printCell(_, hidden) :-     
@@ -257,7 +257,7 @@ main:-
     generateBoard(Difficulty, Board),
     writeln("Board: "),
     writeln(Board),
-    print_board(Board),
+    printBoard(Board),
     writeln("Acao (dig ou flag): "),
     read(Action),
     writeln("Coord X: "),
