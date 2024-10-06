@@ -156,9 +156,8 @@ updateBoard([[X, Y]|Rest], dig, Size, Board, FinalBoard):-
                 append(Rest, Neighbors, NewRest),
                 updateBoard(NewRest, dig, Size, TempBoard, FinalBoard));
             (   updateBoard(Rest, dig, Size, TempBoard, FinalBoard)))).
-updateBoard([X, Y], flag, _, Board, UpdatedBoard):-
+updateBoard([[X, Y]], flag, _, Board, UpdatedBoard):-
     flagBoard(X, Y, Board, UpdatedBoard).
-
 
 % Game Interface
 
@@ -181,7 +180,7 @@ print_column_numbers(Board) :-
 print_column_numbers_aux(Current, Max) :-
     Current =< Max,
     format('~|~`0t~d~2+', [Current]), 
-    write('   '),  
+    write(' '),  
     Next is Current + 1,
     print_column_numbers_aux(Next, Max).
 print_column_numbers_aux(Current, Max) :-
@@ -198,7 +197,7 @@ print_separator(Board) :-
 print_dashes(0) :- !.
 print_dashes(N) :-
     write('------'),  
-    N1 is N - 1,
+    N1 is N - 2,
     print_dashes(N1).
 
 
@@ -215,7 +214,7 @@ print_rows_with_numbers([Row|Rest], RowNum) :-
 print_row([]).
 print_row([[Cell, State]|Rest]) :-
     print_cell(Cell, State),
-    write('    '),  
+    write('  '),  
     print_row(Rest).
 
 
