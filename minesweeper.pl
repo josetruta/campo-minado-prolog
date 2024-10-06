@@ -1,29 +1,3 @@
-% Fatos - Emulando uma declaração de tipos.
-
-cell(mine).
-cell(int_0).
-cell(int_1).
-cell(int_2).
-cell(int_3).
-cell(int_4).
-cell(int_5).
-cell(int_6).
-cell(int_7).
-cell(int_8).
-
-state(hidden).
-state(revealed).
-state(flagged).
-
-difficulty(easy).
-difficulty(medium).
-difficulty(hard).
-
-mode(classical).
-mode(survival).
-mode(timed).
-
-
 % Minesweeper
 
 
@@ -140,11 +114,11 @@ updateBoard([[X, Y]|Rest], dig, Size, Board, UpdatedBoard):-
     updateBoard(Rest, dig, Size, Board, UpdatedBoard).
 updateBoard([[X, Y]|Rest], dig, Size, Board, FinalBoard):-
     digBoard(X, Y, Board, TempBoard, [Cell, State]),
-    (   (Cell =:= 0, State = hidden)  ->
+    (   (Cell = 0, State = hidden)  ->
         (   neighbors([X, Y], Neighbors),
             append(Rest, Neighbors, NewRest),
             updateBoard(NewRest, dig, Size, TempBoard, FinalBoard));
-        (   (Cell =:= 0, State = flagged)  ->
+        (   (Cell = 0, State = flagged)  ->
             (   neighbors([X, Y], Neighbors),
                 append(Rest, Neighbors, NewRest),
                 updateBoard(NewRest, dig, Size, TempBoard, FinalBoard));
@@ -167,8 +141,8 @@ checkDefeat(Mode, [_|Rest]):- checkDefeat(Mode, Rest).
 
 checkVictory([], wins).
 checkVictory([[mine, _]|Rest], Status):- checkVictory(Rest, Status).
-checkVictory([[_, hidden]], continues).
-checkVictory([[_, flagged]], continues).
+checkVictory([[_, hidden]|_], continues):- !.
+checkVictory([[_, flagged]|_], continues):- !.
 checkVictory([[_, _]|Rest], Status):- checkVictory(Rest, Status).
 
 
@@ -242,28 +216,62 @@ printCell(Value, revealed) :-
     write(Value).
 
 
+action("D", dig).
+action("B", flag).
+action(_, dig).
+
+
+getUserAction(Action, X, Y):-
+    writeln("Escolha uma ação: (D)esenterrar ou (B)andeira, seguido de coordenadas (X, Y) (ex: D 1 1): "),
+    read_line_to_string(user_input, Input),
+    split_string(Input, " ", "", InputList),
+    [ActionString, XString, YString] = InputList,
+    action(ActionString, Action),
+    atom_number(XString, X),
+    atom_number(YString, Y).
+
+    
 % Main
 
 
-main:-
-    write("Dificuldade: "),
-    read(Difficulty),
-    getSize(Difficulty, Size),
-    write("Quantidade de linhas: "),
-    writeln(Size),
-    generateMines(Size, ListMines),
-    write("Coordenadas das minas: "),
-    writeln(ListMines),
+mode("C", classic).
+mode("S", survival).
+mode("F", timed).
+mode(_, classic).
+
+
+difficulty("F", easy).
+difficulty("M", medium).
+difficulty("D", hard).
+difficulty(_, easy).
+
+
+startGame(Mode, Difficulty):-
+    mode(Mode, ChosenMode),
+    difficulty(Difficulty, ChosenDifficulty),
     generateBoard(Difficulty, Board),
-    writeln("Board: "),
-    writeln(Board),
     printBoard(Board),
-    writeln("Acao (dig ou flag): "),
-    read(Action),
-    writeln("Coord X: "),
-    read(X),
-    writeln("Coord Y: "),
-    read(Y),
-    updateBoard([[X, Y]], Action, Size, Board, NewBoard),
-    writeln("Board atualizado"),
-    printBoard(NewBoard).
+    gameLoop(ChosenMode, ChosenDifficulty, Board).
+
+
+gameLoop(Mode, Difficulty, Board):-
+    getUserAction(Action, X, Y),
+    getSize(Difficulty, Size),    
+    updateBoard([[X, Y]], Action, Size, Board, UpdatedBoard),
+    printBoard(UpdatedBoard),
+    flattenBoard(UpdatedBoard, FlattenBoard),
+    (   checkDefeat(Mode, FlattenBoard)     ->
+            (   writeln("VOCÊ PERDEU!"));
+            (   checkVictory(FlattenBoard, Status),
+                (   Status = wins   ->
+                    (   writeln("VOCÊ GANHOU!"));
+                    gameLoop(Mode, Difficulty, UpdatedBoard)))).
+
+
+main:-
+    writeln("MENU"),
+    writeln("Escolha o modo de jogo - (C)lássico, (S)urvival, Contra o (T)empo: "),
+    read(Mode),
+    writeln("Escolha a dificuldade - (F)ácil, (M)édio, (D)íficil: "),
+    read(Difficulty),
+    startGame(Mode, Difficulty).
