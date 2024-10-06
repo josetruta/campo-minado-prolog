@@ -224,7 +224,7 @@ action(_, dig).
 
 
 getUserAction(Action, X, Y):-
-    writeln("Escolha uma ação: (D)esenterrar ou (B)andeira, seguido de coordenadas (X, Y) (ex: D 1 1): "),
+    writeln("Escolha um Movimento: (D) Desenterrar ou (B) Bandeira, seguido de coordenadas (X, Y) (ex: D 1 1): "),
     read_line_to_string(user_input, Input),
     split_string(Input, " ", "", InputList),
     [ActionString, XString, YString] = InputList,
@@ -288,10 +288,10 @@ gameLoop(Mode, Difficulty, Board):-
     printBoard(UpdatedBoard),
     flattenBoard(UpdatedBoard, FlattenBoard),
     (   checkDefeat(Mode, FlattenBoard)     ->
-            (   writeln("VOCÊ PERDEU!"));
+            (   writeln("PERDEU!!!!!"));
             (   checkVictory(FlattenBoard, Status),
                 (   Status = wins   ->
-                    (   writeln("VOCÊ GANHOU!"));
+                    (   writeln("GANHOU!!!!!"));
                     gameLoop(Mode, Difficulty, UpdatedBoard)))).
 
 
@@ -299,10 +299,19 @@ readMode(Mode):- read_line_to_string(user_input, Mode).
 readDifficulty(Diff):- read_line_to_string(user_input, Diff).
 
 main:-
+    format('~n'),
+    format('\u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 ~n'),
+    format('\u25A0                                     \u25A0~n'),
+    format('\u25A0      C A M P O   M I N A D O        \u25A0~n'),
+    format('\u25A0                                     \u25A0~n'),
+    format('\u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 ~n'),
+    format('~n'),
+
+
     writeln("MENU"),
-    writeln("Escolha o modo de jogo - (C)lássico, (S)urvival, Contra o (T)empo: "),
+    writeln("Escolha o modo de jogo - (C) Classico, (S) Survival, (T) Contra o Tempo: "),
     readMode(Mode),
-    writeln("Escolha a dificuldade - (F)ácil, (M)édio, (D)íficil: "),
+    writeln("Escolha a dificuldade - (F) Facil, (M) Medio, (D) Dificil: "),
     readDifficulty(Difficulty),
     startGame(Mode, Difficulty),
     halt.
