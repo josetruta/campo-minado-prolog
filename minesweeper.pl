@@ -236,20 +236,20 @@ getUserAction(Action, X, Y):-
 
 mode("C", classic).
 mode("S", survival).
-mode("F", timed).
-mode(_, classic).
+mode("T", timed).
+%mode(_, classic).
 
 
 difficulty("F", easy).
 difficulty("M", medium).
 difficulty("D", hard).
-difficulty(_, easy).
+%difficulty(_, easy).
 
 
 startGame(Mode, Difficulty):-
     mode(Mode, ChosenMode),
     difficulty(Difficulty, ChosenDifficulty),
-    generateBoard(Difficulty, Board),
+    generateBoard(ChosenDifficulty, Board),
     printBoard(Board),
     gameLoop(ChosenMode, ChosenDifficulty, Board).
 
@@ -268,10 +268,13 @@ gameLoop(Mode, Difficulty, Board):-
                     gameLoop(Mode, Difficulty, UpdatedBoard)))).
 
 
+readMode(Mode):- read_line_to_string(user_input, Mode).
+readDifficulty(Diff):- read_line_to_string(user_input, Diff).
+
 main:-
     writeln("MENU"),
     writeln("Escolha o modo de jogo - (C)lássico, (S)urvival, Contra o (T)empo: "),
-    read(Mode),
+    readMode(Mode),
     writeln("Escolha a dificuldade - (F)ácil, (M)édio, (D)íficil: "),
-    read(Difficulty),
+    readDifficulty(Difficulty),
     startGame(Mode, Difficulty).
