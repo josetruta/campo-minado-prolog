@@ -133,9 +133,11 @@ flattenBoard([Row|Rest], Flatten):-
     append(Row, TempFlatten, Flatten).
 
 
-checkDefeat(survival, [[mine, flagged]|Rest]):- checkDefeat(survival, Rest).
-checkDefeat(survival, [[_, flagged]|_]):-!.
-checkDefeat(_, [[mine, revealed]|_]):-!.
+checkDefeat(survival, [[Cell, flagged]|Rest]):-
+    (   Cell = mine		->  
+    	(   checkDefeat(survival, Rest));
+    	(   !)).
+checkDefeat(_, [[mine, revealed]|]):-!.
 checkDefeat(Mode, [_|Rest]):- checkDefeat(Mode, Rest).
 
 
