@@ -71,13 +71,8 @@ countNeighborsMines([[X, Y]|T], ListMines, C):-
         countNeighborsMines(T, ListMines, C)).
 
 
-contains([X, Y], [[X, Y]|_]):-!.
-contains(Coord, [_|Rest]):-
-    contains(Coord, Rest).
-
-
 getState([X, Y], ListMines, [Cell, State]):-
-    (   contains([X, Y], ListMines)   ->
+    (   member([X, Y], ListMines)   ->
         (Cell = mine,
         State = hidden);
         (neighbors([X, Y], Neighbors),
@@ -116,8 +111,6 @@ digBoard(X, Y, [Row|Rest], [Row|DiggedRest], [Cell, State]):-
     digBoard(X1, Y, Rest, DiggedRest, [Cell, State]).
 
 digBoardRow(_, [], [], _).
-
-
 digBoardRow(1, [[Cell, State]|Rest], [Digged|Rest], [Cell, State]):-
     Digged = [Cell, revealed], !.
 digBoardRow(Y, [Elem|Rest], [Elem|DiggedRest], [Cell, State]):-
@@ -159,56 +152,76 @@ updateBoard([[X, Y]|Rest], dig, Size, Board, FinalBoard):-
 updateBoard([[X, Y]], flag, _, Board, UpdatedBoard):-
     flagBoard(X, Y, Board, UpdatedBoard).
 
+
+flattenBoard([Row|[]], Row).
+flattenBoard([Row|Rest], Flatten):-
+    flattenBoard(Rest, TempFlatten),
+    append(Row, TempFlatten, Flatten).
+
+
+checkDefeat(survival, [[mine, flagged]|Rest]):- checkDefeat(survival, Rest).
+checkDefeat(survival, [[_, flagged]|_]):-!.
+checkDefeat(_, [[mine, revealed]|_]):-!.
+checkDefeat(Mode, [_|Rest]):- checkDefeat(Mode, Rest).
+
+
+checkVictory([], wins).
+checkVictory([[mine, _]|Rest], Status):- checkVictory(Rest, Status).
+checkVictory([[_, hidden]], continues).
+checkVictory([[_, flagged]], continues).
+checkVictory([[_, _]|Rest], Status):- checkVictory(Rest, Status).
+
+
 % Game Interface
 
 
-print_board(Board) :-
+printBoard(Board) :-
     nl,
-    print_column_numbers(Board),   
-    print_separator(Board),       
-    print_rows_with_numbers(Board, 1),  
+    printColumnNumbers(Board),   
+    printSeparator(Board),       
+    printRowsWithNumbers(Board, 1),  
     nl.
 
 
-print_column_numbers(Board) :-
+printColumnNumbers(Board) :-
     length(Board, Size),  
     write('      '),      
-    print_column_numbers_aux(1, Size),
+    printColumnNumbersAux(1, Size),
     nl.
 
 
-print_column_numbers_aux(Current, Max) :-
+printColumnNumbersAux(Current, Max) :-
     Current =< Max,
     format('~|~`0t~d~2+', [Current]), 
     write(' '),  
     Next is Current + 1,
-    print_column_numbers_aux(Next, Max).
-print_column_numbers_aux(Current, Max) :-
+    printColumnNumbersAux(Next, Max).
+printColumnNumbersAux(Current, Max) :-
     Current > Max.
 
 
-print_separator(Board) :-
+printSeparator(Board) :-
     length(Board, Size),  
     write('     '),       
-    print_dashes(Size),
+    printDashes(Size),
     nl.
 
 
-print_dashes(0) :- !.
-print_dashes(N) :-
+printDashes(0) :- !.
+printDashes(N) :-
     write('------'),  
     N1 is N - 2,
     print_dashes(N1).
 
 
-print_rows_with_numbers([], _).
-print_rows_with_numbers([Row|Rest], RowNum) :-
+printRowsWithNumbers([], _).
+printRowsWithNumbers([Row|Rest], RowNum) :-
     format('~|~`0t~d~2+', [RowNum]),  
     write(' |   '),  
-    print_row(Row),
+    printRow(Row),
     nl,
     NextRowNum is RowNum + 1,
-    print_rows_with_numbers(Rest, NextRowNum).
+    printRowsWithNumbers(Rest, NextRowNum).
 
 
 print_row([]).
@@ -218,13 +231,13 @@ print_row([[Cell, State]|Rest]) :-
     print_row(Rest).
 
 
-print_cell(_, hidden) :-     
+printCell(_, hidden) :-     
     write('\u25A0').              
-print_cell(_, flagged) :-    
+printCell(_, flagged) :-    
     write('\u25B8').              
-print_cell(mine, revealed) :-  
+printCell(mine, revealed) :-  
     write('\u25CF').             
-print_cell(Value, revealed) :-  
+printCell(Value, revealed) :-  
     Value \= mine,           
     write(Value).
 
@@ -253,4 +266,4 @@ main:-
     read(Y),
     updateBoard([[X, Y]], Action, Size, Board, NewBoard),
     writeln("Board atualizado"),
-    print_board(NewBoard).
+    printBoard(NewBoard).
