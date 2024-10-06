@@ -6,6 +6,11 @@ getSize(medium, 16).
 getSize(_, 8).
 
 
+getTimeLimit(hard, 600).
+getTimeLimit(medium, 400).
+getTimeLimit(_, 200).
+
+
 getNumberOfMines(Size, NumMines):-
     NumMines is (Size * Size // 6).
 
@@ -133,12 +138,18 @@ flattenBoard([Row|Rest], Flatten):-
     append(Row, TempFlatten, Flatten).
 
 
-checkDefeat(survival, [[Cell, flagged]|Rest]):-
+checkDefeat(timed, Board, Difficulty, StartTime):-
+    getTimeLimit(Difficulty, TimeLimit),
+    durationTime(StartTime, Duration),
+    (   Duration > TimeLimit    ->
+        (   writeln("TEMPO ACABOU"));
+        (   checkDefeat(classic, Board, Difficulty, StartTime))).
+checkDefeat(survival, [[Cell, flagged]|Rest], Difficulty, StartTime):-
     (   Cell = mine		->  
-    	(   checkDefeat(survival, Rest));
+    	(   checkDefeat(survival, Rest, Difficulty, StartTime));
     	(   !)).
-checkDefeat(_, [[mine, revealed]|_]):-!.
-checkDefeat(Mode, [_|Rest]):- checkDefeat(Mode, Rest).
+checkDefeat(_, [[mine, revealed]|_], _, _):-!.
+checkDefeat(Mode, [_|Rest], Difficulty, StartTime):- checkDefeat(Mode, Rest, Difficulty, StartTime).
 
 
 checkVictory([], wins).
@@ -249,12 +260,26 @@ durationTime(StartTime, Duration):-
     Duration is CurrentTime - StartTime.
 
 
-printEndTime(StartTime):-
+printDurationTime(StartTime):-
     durationTime(StartTime, Duration),
     write("Tempo decorrido: "),
-    write(Duration),
+    DurationRounded is round(Duration),
+    write(DurationRounded),
     writeln(" segundos.").
-    
+
+
+% Text Cards
+
+
+initCard:-
+    format('~n'),
+    format('\u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 ~n'),
+    format('\u25A0                                     \u25A0~n'),
+    format('\u25A0      C A M P O   M I N A D O        \u25A0~n'),
+    format('\u25A0                                     \u25A0~n'),
+    format('\u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 ~n'),
+    format('~n').
+   
     
 % Main
 
@@ -277,41 +302,32 @@ startGame(Mode, Difficulty):-
     generateBoard(ChosenDifficulty, Board),
     printBoard(Board),
     startTime(StartTime),
-    gameLoop(ChosenMode, ChosenDifficulty, Board),
-    printEndTime(StartTime).
+    gameLoop(ChosenMode, ChosenDifficulty, Board, StartTime),
+    printDurationTime(StartTime).
 
 
-gameLoop(Mode, Difficulty, Board):-
+gameLoop(Mode, Difficulty, Board, StartTime):-
     getUserAction(Action, X, Y),
     getSize(Difficulty, Size),    
     updateBoard([[X, Y]], Action, Size, Board, UpdatedBoard),
     printBoard(UpdatedBoard),
     flattenBoard(UpdatedBoard, FlattenBoard),
-    (   checkDefeat(Mode, FlattenBoard)     ->
-            (   writeln("PERDEU!!!!!"));
+    (   checkDefeat(Mode, FlattenBoard, Difficulty, StartTime)     ->
+            (   writeln("PERDEU!"));
             (   checkVictory(FlattenBoard, Status),
                 (   Status = wins   ->
-                    (   writeln("GANHOU!!!!!"));
-                    gameLoop(Mode, Difficulty, UpdatedBoard)))).
+                    (   writeln("GANHOU!"));
+                    gameLoop(Mode, Difficulty, UpdatedBoard, StartTime)))).
 
 
 readMode(Mode):- read_line_to_string(user_input, Mode).
 readDifficulty(Diff):- read_line_to_string(user_input, Diff).
 
+
 main:-
-    format('~n'),
-    format('\u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 ~n'),
-    format('\u25A0                                     \u25A0~n'),
-    format('\u25A0      C A M P O   M I N A D O        \u25A0~n'),
-    format('\u25A0                                     \u25A0~n'),
-    format('\u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 ~n'),
-    format('~n'),
-
-
-    writeln("MENU"),
+    initCard,
     writeln("Escolha o modo de jogo - (C) Classico, (S) Survival, (T) Contra o Tempo: "),
     readMode(Mode),
     writeln("Escolha a dificuldade - (F) Facil, (M) Medio, (D) Dificil: "),
     readDifficulty(Difficulty),
-    startGame(Mode, Difficulty),
-    halt.
+    startGame(Mode, Difficulty).
