@@ -330,4 +330,5 @@ main:-
     readMode(Mode),
     writeln("Escolha a dificuldade - (F) Facil, (M) Medio, (D) Dificil: "),
     readDifficulty(Difficulty),
-    startGame(Mode, Difficulty).
+    startGame(Mode, Difficulty),
+    halt.
