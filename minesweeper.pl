@@ -8,7 +8,7 @@ getSize(_, 8).
 
 getTimeLimit(hard, 600).
 getTimeLimit(medium, 400).
-getTimeLimit(_, 200).
+getTimeLimit(_, 50).
 
 
 getNumberOfMines(Size, NumMines):-
@@ -142,7 +142,8 @@ checkDefeat(timed, Board, Difficulty, StartTime):-
     getTimeLimit(Difficulty, TimeLimit),
     durationTime(StartTime, Duration),
     (   Duration > TimeLimit    ->
-        (   writeln("TEMPO ACABOU"));
+        (   nl,
+            writeln("  >> TEMPO ACABOU!"));
         (   checkDefeat(classic, Board, Difficulty, StartTime))).
 checkDefeat(survival, [[Cell, flagged]|Rest], Difficulty, StartTime):-
     (   Cell = mine		->  
@@ -262,10 +263,12 @@ durationTime(StartTime, Duration):-
 
 printDurationTime(StartTime):-
     durationTime(StartTime, Duration),
-    write("Tempo decorrido: "),
+    nl,
+    write(" >> Tempo decorrido: "),
     DurationRounded is round(Duration),
     write(DurationRounded),
-    writeln(" segundos.").
+    writeln(" segundos."),
+    nl.
 
 
 % Text Cards
