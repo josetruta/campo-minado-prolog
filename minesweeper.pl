@@ -280,7 +280,25 @@ initCard:-
     format('\u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 ~n'),
     format('~n').
    
-    
+loseCard:-
+    format('~n'),
+    format('\u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 ~n'),
+    format('\u25A0                                     \u25A0~n'),
+    format('\u25A0              PERDEU!!!              \u25A0~n'),
+    format('\u25A0                                     \u25A0~n'),
+    format('\u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 ~n'),
+    format('~n').
+
+winCard:-
+    format('~n'),
+    format('\u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 ~n'),
+    format('\u25A0                                     \u25A0~n'),
+    format('\u25A0              GANHOU!!!              \u25A0~n'),
+    format('\u25A0                                     \u25A0~n'),
+    format('\u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 \u25A0 ~n'),
+    format('~n').
+
+
 % Main
 
 
@@ -313,10 +331,10 @@ gameLoop(Mode, Difficulty, Board, StartTime):-
     printBoard(UpdatedBoard),
     flattenBoard(UpdatedBoard, FlattenBoard),
     (   checkDefeat(Mode, FlattenBoard, Difficulty, StartTime)     ->
-            (   writeln("PERDEU!"));
+            (   loseCard);
             (   checkVictory(FlattenBoard, Status),
                 (   Status = wins   ->
-                    (   writeln("GANHOU!"));
+                    ( winCard);
                     gameLoop(Mode, Difficulty, UpdatedBoard, StartTime)))).
 
 
