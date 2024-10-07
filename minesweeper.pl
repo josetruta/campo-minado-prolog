@@ -8,7 +8,7 @@ getSize(_, 8).
 
 getTimeLimit(hard, 600).
 getTimeLimit(medium, 400).
-getTimeLimit(_, 50).
+getTimeLimit(_, 200).
 
 
 getNumberOfMines(Size, NumMines):-
