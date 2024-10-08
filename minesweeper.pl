@@ -44,6 +44,9 @@ neighbors([X, Y], Neighbors) :-
 
 countNeighborsMines([],_,0).
 countNeighborsMines([[X, Y]|T], ListMines, C):-
+    (   X =< 0; Y =< 0   ),
+    countNeighborsMines(T, ListMines, C).
+countNeighborsMines([[X, Y]|T], ListMines, C):-
     (   member([X, Y], ListMines) ->
         (	countNeighborsMines(T, ListMines, C1),
             C is C1+1);
